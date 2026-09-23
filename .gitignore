@@ -48,3 +48,6 @@ data/processed/*.csv
 !/data/processed/.gitkeep
 
 models/*.json
+
+mlflow.db
+mlartifacts/

@@ -3,16 +3,23 @@ Model training.
 
 Loads the processed Wine Quality dataset, trains a Random Forest
 classifier on the low/medium/high quality_class target, evaluates
-it, and saves the trained model to disk.
+it, logs the run to MLflow (params, metrics, model artifact), and
+saves the trained model to disk for the FastAPI app to load.
 
 Run locally:
     python -m src.train
+
+View MLflow results:
+    mlflow ui --backend-store-uri mlruns
+    (then open http://127.0.0.1:5000)
 """
 
 import json
 from pathlib import Path
 
 import joblib
+import mlflow
+import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
@@ -62,25 +69,54 @@ def evaluate_model(model, X_test, y_test) -> dict:
 def run_training_pipeline():
     params = load_params()
 
+    mlflow.set_tracking_uri(params["mlflow"]["tracking_uri"])
+    mlflow.set_experiment(params["mlflow"]["experiment_name"])
+
     raw_df = load_raw_data(params["data"]["raw_path"], params["data"]["delimiter"])
     processed_df = preprocess(raw_df, params)
     X_train, X_test, y_train, y_test = split_data(processed_df, params)
 
     print(f"Train size: {len(X_train)}, Test size: {len(X_test)}")
 
-    model = train_model(X_train, y_train, params)
-    metrics = evaluate_model(model, X_test, y_test)
+    with mlflow.start_run():
+        # --- Log parameters ---
+        model_cfg = params["model"]
+        mlflow.log_param("model_type", model_cfg["type"])
+        mlflow.log_param("n_estimators", model_cfg["n_estimators"])
+        mlflow.log_param("max_depth", model_cfg["max_depth"])
+        mlflow.log_param("random_state", model_cfg["random_state"])
+        mlflow.log_param("test_size", params["data"]["test_size"])
 
-    print("\nMetrics:")
-    for k, v in metrics.items():
-        print(f"  {k}: {v:.4f}")
+        # --- Train ---
+        model = train_model(X_train, y_train, params)
+        metrics = evaluate_model(model, X_test, y_test)
 
-    # Save model
+        print("\nMetrics:")
+        for k, v in metrics.items():
+            print(f"  {k}: {v:.4f}")
+
+        # --- Log metrics ---
+        for k, v in metrics.items():
+            mlflow.log_metric(k, v)
+
+        # --- Log model artifact to MLflow ---
+        mlflow.sklearn.log_model(
+            model,
+            name="model",
+            skops_trusted_types=["sklearn.tree._tree.Tree"],
+        )
+
+        run_id = mlflow.active_run().info.run_id
+        print(f"\nMLflow run ID: {run_id}")
+
+    # --- Save model + metrics locally too, for the FastAPI app ---
+    # (FastAPI loads directly from models/model.pkl rather than
+    # querying MLflow at request time, to keep serving simple/fast)
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, MODEL_PATH)
-    print(f"\nModel saved to: {MODEL_PATH}")
+    print(f"Model saved to: {MODEL_PATH}")
 
-    # Save metrics
+    metrics["mlflow_run_id"] = run_id
     with open(METRICS_PATH, "w") as f:
         json.dump(metrics, f, indent=2)
     print(f"Metrics saved to: {METRICS_PATH}")
