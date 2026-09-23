@@ -1,0 +1,15 @@
+# Prometheus scrape configuration.
+# Tells Prometheus where to find our FastAPI app's /metrics
+# endpoint and how often to poll it.
+
+global:
+  scrape_interval: 5s # how often to scrape targets
+
+scrape_configs:
+  - job_name: "wine-quality-api"
+    metrics_path: "/metrics"
+    static_configs:
+      # 'api' is the FastAPI service's name inside the Docker
+      # Compose network (see docker-compose.yml) - Docker's internal
+      # DNS resolves this to the container's IP automatically.
+      - targets: ["api:8000"]
