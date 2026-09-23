@@ -1,0 +1,35 @@
+# Central configuration for the ML pipeline.
+# Training, validation, and preprocessing code all read from here
+# instead of hard-coding values (see Section 21 of project spec).
+
+data:
+  raw_path: "data/raw/winequality-red.csv"
+  processed_path: "data/processed/wine_processed.csv"
+  delimiter: ";"
+  test_size: 0.2
+  random_state: 42
+
+# Quality-score bucket boundaries, based on actual distribution
+# inspected in Phase 5 Step 1 (quality 3-8, heavily skewed toward 5-6).
+target:
+  column: "quality"
+  buckets:
+    low: [0, 5]      # quality <= 5
+    medium: [6, 6]   # quality == 6
+    high: [7, 10]    # quality >= 7
+
+model:
+  type: "random_forest"
+  n_estimators: 100
+  max_depth: 10
+  random_state: 42
+
+# PLACEHOLDER thresholds — will be updated with real numbers
+# after the first training run (Phase 5, next step).
+validation:
+  min_accuracy: 0.60
+  min_f1: 0.55
+
+mlflow:
+  experiment_name: "wine_quality_classification"
+  tracking_uri: "mlruns"
