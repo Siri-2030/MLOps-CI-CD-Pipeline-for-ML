@@ -1,0 +1,45 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment variables / secrets
+.env
+
+# MLflow
+mlruns/
+mlflow.db
+
+# DVC (cache only - .dvc metadata files ARE tracked)
+/data/raw/*.csv
+!/data/raw/.gitkeep
+
+# Models (tracked via DVC/MLflow, not Git directly)
+models/*.pkl
+models/*.joblib
+!models/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Jupyter
+.ipynb_checkpoints/
