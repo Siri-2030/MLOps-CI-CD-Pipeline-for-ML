@@ -1,0 +1,12 @@
+# Production dependencies - what the trained model and FastAPI
+# serving app actually need at runtime. Pinned to exact versions
+# used during development for reproducibility (Section 20/22).
+
+pandas==3.0.6
+scikit-learn==1.9.1
+fastapi==0.141.1
+uvicorn==0.53.0
+pydantic==2.13.5
+joblib==1.6.0
+mlflow==3.16.1
+PyYAML==6.0.3
