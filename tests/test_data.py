@@ -5,7 +5,6 @@ Run:
     pytest tests/test_data.py -v
 """
 
-import pandas as pd
 import pytest
 
 from src.config import load_params
@@ -87,7 +86,7 @@ class TestPreprocessing:
 
     def test_split_data_produces_correct_proportions(self, raw_df, params):
         processed = preprocess(raw_df, params)
-        X_train, X_test, y_train, y_test = split_data(processed, params)
+        X_train, X_test, _y_train, _y_test = split_data(processed, params)
 
         total = len(X_train) + len(X_test)
         assert total == len(processed)
@@ -98,7 +97,7 @@ class TestPreprocessing:
 
     def test_split_data_excludes_target_columns_from_features(self, raw_df, params):
         processed = preprocess(raw_df, params)
-        X_train, X_test, y_train, y_test = split_data(processed, params)
+        X_train, _X_test, _y_train, _y_test = split_data(processed, params)
 
         assert "quality" not in X_train.columns
         assert "quality_class" not in X_train.columns

@@ -8,7 +8,6 @@ Run:
     pytest tests/test_api.py -v
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app

@@ -1,0 +1,96 @@
+name: CI Pipeline
+
+# Path-filtered triggers (Section 16): only run when files that
+# actually affect the pipeline change - avoids wasting CI minutes
+# on README-only or docs-only commits.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "app/**"
+      - "tests/**"
+      - "data/**"
+      - "*.dvc"
+      - "dvc.yaml"
+      - "params.yaml"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "requirements-dev.txt"
+      - ".github/workflows/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "app/**"
+      - "tests/**"
+      - "data/**"
+      - "*.dvc"
+      - "dvc.yaml"
+      - "params.yaml"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "requirements-dev.txt"
+      - ".github/workflows/**"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    env:
+      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+      DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+
+    steps:
+      # Stage 1: Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Stage 2: Python Setup
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Stage 3: Dependency Installation
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # Stage 4: Code Quality (lint)
+      - name: Lint with ruff
+        run: ruff check src app tests
+
+      # Pull the DVC-tracked dataset from the DagsHub remote
+      - name: Configure DVC remote credentials
+        run: |
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user "$DAGSHUB_USERNAME"
+          dvc remote modify origin --local password "$DAGSHUB_TOKEN"
+
+      - name: Pull dataset via DVC
+        run: dvc pull
+
+      # Stage 6: Dataset Validation
+      - name: Validate dataset
+        run: python scripts/validate_data.py
+
+      # Stage 5: Unit Tests
+      - name: Run pytest
+        run: pytest -v
+
+      # Stage 7: Model Training
+      - name: Train model
+        run: python -m src.train
+
+      # Stage 8: Model Validation (quality gate - blocks pipeline on failure)
+      - name: Validate model against thresholds
+        run: python -m src.model_validation
+
+      # Stage 10: Docker Build (only reached if all prior stages passed)
+      - name: Build Docker image
+        run: docker build -t wine-quality-api:${{ github.sha }} .
+
+      - name: Confirm image built successfully
+        run: docker images wine-quality-api:${{ github.sha }}

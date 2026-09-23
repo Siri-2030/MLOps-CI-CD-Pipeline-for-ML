@@ -27,7 +27,7 @@ def split(params):
 
 @pytest.fixture(scope="module")
 def trained_model(split, params):
-    X_train, X_test, y_train, y_test = split
+    X_train, _X_test, y_train, _y_test = split
     return train_model(X_train, y_train, params)
 
 

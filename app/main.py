@@ -13,9 +13,9 @@ Run locally:
 
 import time
 from pathlib import Path
-from typing import Optional
-import pandas as pd
+
 import joblib
+import pandas as pd
 from fastapi import FastAPI, Response
 from pydantic import BaseModel, Field
 
@@ -30,10 +30,10 @@ app = FastAPI(
 
 # --- Load model once at startup ---
 model = None
-model_load_error: Optional[str] = None
+model_load_error: str | None = None
 try:
     model = joblib.load(MODEL_PATH)
-except Exception as e:
+except (FileNotFoundError, OSError, ValueError) as e:
     model_load_error = str(e)
 
 # --- Simple in-memory metrics (exposed via /metrics) ---
