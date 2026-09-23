@@ -14,7 +14,7 @@ Run locally:
 import time
 from pathlib import Path
 from typing import Optional
-
+import pandas as pd
 import joblib
 from fastapi import FastAPI, Response
 from pydantic import BaseModel, Field
@@ -123,7 +123,7 @@ def predict(features: WineFeatures):
         "density", "pH", "sulphates", "alcohol",
     ]
     data = features.model_dump(by_alias=True)
-    row = [[data[col] for col in feature_order]]
+    row = pd.DataFrame([[data[col] for col in feature_order]], columns=feature_order)
 
     prediction = model.predict(row)[0]
     metrics_state["prediction_count"] += 1
