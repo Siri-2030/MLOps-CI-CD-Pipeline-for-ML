@@ -19,9 +19,8 @@ def load_params(path: Path = PARAMS_PATH) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(f"Config file not found at {path}")
 
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8-sig") as f:
         params = yaml.safe_load(f)
-
     return params
 
 

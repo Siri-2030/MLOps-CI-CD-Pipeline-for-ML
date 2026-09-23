@@ -35,5 +35,5 @@ validation:
 
 mlflow:
   experiment_name: "wine_quality_classification"
-  tracking_uri: "mlruns"
+  tracking_uri: "sqlite:///mlflow.db"
 
