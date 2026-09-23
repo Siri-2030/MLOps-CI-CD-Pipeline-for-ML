@@ -1,0 +1,56 @@
+# Local monitoring stack: FastAPI (model serving) + Prometheus
+# (metrics collection) + Grafana (dashboards).
+#
+# All three services share the 'wine-net' network, letting them
+# reach each other by service name (e.g. Prometheus scrapes
+# 'api:8000', Grafana queries 'prometheus:9090').
+#
+# Usage:
+#   docker compose up --build     (start everything)
+#   docker compose down           (stop everything)
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wine-api
+    ports:
+      - "8000:8000"
+    networks:
+      - wine-net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: wine-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - wine-net
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: wine-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    networks:
+      - wine-net
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+networks:
+  wine-net:
+    driver: bridge
