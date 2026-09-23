@@ -76,13 +76,16 @@ jobs:
       - name: Validate dataset
         run: python scripts/validate_data.py
 
-      # Stage 5: Unit Tests
-      - name: Run pytest
-        run: pytest -v
-
       # Stage 7: Model Training
+      # (must run before tests - test_api.py loads models/model.pkl
+      # at import time to test the /predict endpoint)
       - name: Train model
         run: python -m src.train
+
+      # Stage 5: Unit Tests (data, model, validation-gate, and API tests -
+      # the last of these requires a trained model.pkl to exist)
+      - name: Run pytest
+        run: pytest -v
 
       # Stage 8: Model Validation (quality gate - blocks pipeline on failure)
       - name: Validate model against thresholds
