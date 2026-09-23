@@ -1,0 +1,14 @@
+# Auto-provisions Prometheus as a Grafana data source on startup,
+# so it doesn't need to be added manually through the UI.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    # 'prometheus' is the Prometheus service's name inside the
+    # Docker Compose network (see docker-compose.yml).
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true

@@ -1,0 +1,93 @@
+{
+  "title": "Wine Quality API - Monitoring Dashboard",
+  "uid": "wine-quality-api-dashboard",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Requests",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "app_request_count_total",
+          "legendFormat": "requests"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Requests per Second",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(app_request_count_total[1m])",
+          "legendFormat": "req/sec"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Prediction Requests",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "app_prediction_count_total",
+          "legendFormat": "predictions"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Error Count",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 6 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "app_error_count_total",
+          "legendFormat": "errors"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Average Request Latency (seconds)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 6, "y": 8 },
+      "targets": [
+        {
+          "expr": "app_request_latency_seconds_avg",
+          "legendFormat": "avg latency"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "API Health / Status Codes",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 6 },
+      "targets": [
+        {
+          "expr": "app_status_code_count",
+          "legendFormat": "{{code}}"
+        }
+      ]
+    }
+  ]
+}

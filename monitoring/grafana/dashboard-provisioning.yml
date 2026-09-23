@@ -1,0 +1,14 @@
+# Tells Grafana to auto-load any dashboard JSON files found in
+# the dashboards/ folder, instead of requiring manual import.
+
+apiVersion: 1
+
+providers:
+  - name: "Wine Quality API Dashboards"
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards
