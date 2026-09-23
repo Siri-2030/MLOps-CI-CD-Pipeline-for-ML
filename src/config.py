@@ -29,3 +29,4 @@ if __name__ == "__main__":
     params = load_params()
     print("Loaded params.yaml successfully:")
     print(params)
+# Trigger CI/CD pipeline
