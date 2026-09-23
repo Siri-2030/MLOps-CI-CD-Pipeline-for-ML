@@ -22,7 +22,6 @@ jobs:
     env:
       DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
       DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
-      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/wine-quality-api
 
     steps:
       - name: Checkout repository
@@ -59,6 +58,18 @@ jobs:
       # separate workflow runs.)
       - name: Train model
         run: python -m src.train
+
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/wine-quality-api" >> $GITHUB_ENV
+
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/wine-quality-api" >> $GITHUB_ENV
+
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/wine-quality-api" >> $GITHUB_ENV
+
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/wine-quality-api" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
