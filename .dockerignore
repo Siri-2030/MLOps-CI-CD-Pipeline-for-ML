@@ -1,0 +1,32 @@
+# Don't send these into the Docker build context - keeps builds
+# fast and images small/secure.
+
+.venv/
+.git/
+.dvc/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+
+# Data - the raw CSV isn't needed inside the container (only the
+# already-trained model.pkl is copied in explicitly)
+data/
+
+# MLflow local tracking store - not needed at runtime
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Tests and dev tooling - not part of the production image
+tests/
+notebooks/
+scripts/
+.pytest_cache/
+.ruff_cache/
+
+# Docs and misc
+README.md
+*.md
+.env
+requirements-dev.txt
