@@ -1,4 +1,4 @@
-# Central configuration for the ML pipeline.
+﻿# Central configuration for the ML pipeline.
 # Training, validation, and preprocessing code all read from here
 # instead of hard-coding values (see Section 21 of project spec).
 
@@ -24,12 +24,16 @@ model:
   max_depth: 10
   random_state: 42
 
-# PLACEHOLDER thresholds — will be updated with real numbers
-# after the first training run (Phase 5, next step).
+# Thresholds set from real training results (Phase 5):
+# measured accuracy=0.7469, f1=0.7096 on a held-out test split.
+# Set slightly below the measured values so normal run-to-run
+# variation doesn't spuriously fail CI, while still blocking
+# genuinely worse models.
 validation:
-  min_accuracy: 0.60
-  min_f1: 0.55
+  min_accuracy: 0.70
+  min_f1: 0.65
 
 mlflow:
   experiment_name: "wine_quality_classification"
   tracking_uri: "mlruns"
+
