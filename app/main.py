@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 
 MODEL_PATH = Path("models/model.pkl")
 MODEL_VERSION = "1.0.0"
+STARTUP_TIME = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
 
 app = FastAPI(
     title="Wine Quality Classifier API",
@@ -93,6 +94,7 @@ def root():
         "app": "Wine Quality Classifier API",
         "version": MODEL_VERSION,
         "model_loaded": model is not None,
+        "started_at": STARTUP_TIME,
         "endpoints": ["/", "/health", "/predict", "/metrics"],
     }
 

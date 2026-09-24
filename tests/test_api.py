@@ -40,8 +40,8 @@ class TestRootEndpoint:
         assert "app" in data
         assert "version" in data
         assert "model_loaded" in data
+        assert "started_at" in data
         assert "endpoints" in data
-
 
 class TestHealthEndpoint:
     def test_health_returns_200_when_model_loaded(self):
